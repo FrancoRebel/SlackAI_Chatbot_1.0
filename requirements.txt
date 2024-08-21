@@ -1,3 +1,4 @@
+werkzeug
 slack-bolt
 langchain
 openai
