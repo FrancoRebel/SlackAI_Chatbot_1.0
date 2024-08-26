@@ -4,7 +4,7 @@ from slack_bolt.adapter.socket_mode import SocketModeHandler
 from langchain import OpenAI, LLMChain, PromptTemplate
 from langchain.chains.conversation.memory import ConversationalBufferWindowMemory
 
-# Initializes your app with your bot token and socket mode handler
+# Initializes your app with your bot token
 app = App(token=os.environ.get("SLACK_BOT_TOKEN"))
 
 # Langchain implementation
@@ -28,17 +28,21 @@ chatgpt_chain = LLMChain(
 
 # Message handler for Slack
 @app.message(".*")
-def message_handler(message, say, logger):
+def message_handler(message, say):
     print(message)
     
-    output = chatgpt_chain.predict(human_input=message['text'])   
+    output = chatgpt_chain.predict(human_input=message['text'])
     say(output)
 
-# This is the entry point for Vercel
+# Entry point for Vercel
 def handler(request):
-    if request.method == 'POST':
-        SocketModeHandler(app, os.environ["SLACK_APP_TOKEN"]).start()
+    # The handler function does not need to start the SocketModeHandler directly,
+    # because SocketModeHandler should already be running with your Vercel deployment.
     return {
         'statusCode': 200,
         'body': 'Bot is running'
     }
+
+# Start your bot using Socket Mode
+if __name__ == "__main__":
+    SocketModeHandler(app, os.environ["SLACK_APP_TOKEN"]).start()
